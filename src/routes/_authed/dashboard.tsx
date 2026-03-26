@@ -1,10 +1,9 @@
-import { Button } from '@/components/ui/button'
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute('/_authed/dashboard')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  return <div></div>
+  return <div>Hello "/dashboard/"!</div>
 }
