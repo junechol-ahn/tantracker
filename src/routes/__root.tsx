@@ -13,6 +13,7 @@ import {
   HeadContent,
   Scripts,
   Link,
+  useNavigate,
 } from '@tanstack/react-router';
 import appCss from '../app.css?url';
 import poppins100 from '@fontsource/poppins/100.css?url';
@@ -69,6 +70,7 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+  const navigate = useNavigate()
   return (
     <ClerkProvider>
       <html>
@@ -85,9 +87,19 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
                 elements: {
                   userButtonOuterIdentifier: {
                     color: 'white'
-                  }
+                  },
                 }
-                }}/>
+                }}>
+                  <UserButton.MenuItems>
+                    <UserButton.Action label='Dashboard' labelIcon={<ChartColumnBigIcon size={16}/>}
+                      onClick={()=>{
+                        navigate({
+                          to: '/dashboard'
+                        })
+                      }}
+                    />
+                  </UserButton.MenuItems>
+                </UserButton>
             </Show>
             <Show when="signed-out">
               <div className='text-white flex items-center'>
