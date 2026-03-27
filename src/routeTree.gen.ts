@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as AuthedDashboardTransactionsRouteImport } from './routes/_authed/dashboard_.transactions'
+import { Route as AuthedDashboardTransactionsNewRouteImport } from './routes/_authed/dashboard_.transactions.new'
 
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
@@ -27,27 +29,59 @@ const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedDashboardTransactionsRoute =
+  AuthedDashboardTransactionsRouteImport.update({
+    id: '/dashboard_/transactions',
+    path: '/dashboard/transactions',
+    getParentRoute: () => AuthedRoute,
+  } as any)
+const AuthedDashboardTransactionsNewRoute =
+  AuthedDashboardTransactionsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthedDashboardTransactionsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/dashboard/transactions': typeof AuthedDashboardTransactionsRouteWithChildren
+  '/dashboard/transactions/new': typeof AuthedDashboardTransactionsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/dashboard/transactions': typeof AuthedDashboardTransactionsRouteWithChildren
+  '/dashboard/transactions/new': typeof AuthedDashboardTransactionsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/dashboard_/transactions': typeof AuthedDashboardTransactionsRouteWithChildren
+  '/_authed/dashboard_/transactions/new': typeof AuthedDashboardTransactionsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/dashboard/transactions'
+    | '/dashboard/transactions/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard'
-  id: '__root__' | '/' | '/_authed' | '/_authed/dashboard'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/dashboard/transactions'
+    | '/dashboard/transactions/new'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authed'
+    | '/_authed/dashboard'
+    | '/_authed/dashboard_/transactions'
+    | '/_authed/dashboard_/transactions/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -78,15 +112,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/dashboard_/transactions': {
+      id: '/_authed/dashboard_/transactions'
+      path: '/dashboard/transactions'
+      fullPath: '/dashboard/transactions'
+      preLoaderRoute: typeof AuthedDashboardTransactionsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/dashboard_/transactions/new': {
+      id: '/_authed/dashboard_/transactions/new'
+      path: '/new'
+      fullPath: '/dashboard/transactions/new'
+      preLoaderRoute: typeof AuthedDashboardTransactionsNewRouteImport
+      parentRoute: typeof AuthedDashboardTransactionsRoute
+    }
   }
 }
 
+interface AuthedDashboardTransactionsRouteChildren {
+  AuthedDashboardTransactionsNewRoute: typeof AuthedDashboardTransactionsNewRoute
+}
+
+const AuthedDashboardTransactionsRouteChildren: AuthedDashboardTransactionsRouteChildren =
+  {
+    AuthedDashboardTransactionsNewRoute: AuthedDashboardTransactionsNewRoute,
+  }
+
+const AuthedDashboardTransactionsRouteWithChildren =
+  AuthedDashboardTransactionsRoute._addFileChildren(
+    AuthedDashboardTransactionsRouteChildren,
+  )
+
 interface AuthedRouteChildren {
   AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedDashboardTransactionsRoute: typeof AuthedDashboardTransactionsRouteWithChildren
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedDashboardTransactionsRoute:
+    AuthedDashboardTransactionsRouteWithChildren,
 }
 
 const AuthedRouteWithChildren =
