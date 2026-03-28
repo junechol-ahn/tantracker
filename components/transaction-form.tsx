@@ -17,7 +17,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { addDays, format } from 'date-fns';
 import {
   Field,
   FieldContent,
@@ -26,13 +26,14 @@ import {
   FieldSet,
 } from './ui/field';
 import { Textarea } from './ui/textarea';
+import { categoriesTable } from '@/db/schema';
 
-const transactionFormSchema = z.object({
+export const transactionFormSchema = z.object({
   transactionType: z.enum(['income', 'expense']),
   categoryId: z.number().positive('Please select a category'),
   transactionDate: z
     .date()
-    .max(new Date(), 'Transaction date cannot be in the future'),
+    .max(addDays(new Date(), 1), 'Transaction date cannot be in the future'),
   amount: z.number().positive('Amount must be greater than 0'),
   description: z
     .string()
@@ -40,7 +41,13 @@ const transactionFormSchema = z.object({
     .max(300, 'Description must contain a maximum of 300 characters'),
 });
 
-export function TransactionForm() {
+export function TransactionForm({
+  categories,
+  onSubmit
+}: {
+  categories: (typeof categoriesTable.$inferSelect)[],
+  onSubmit: (data: z.infer<typeof transactionFormSchema>) => Promise<void>
+}) {
   const form = useForm<z.infer<typeof transactionFormSchema>>({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: {
@@ -52,9 +59,12 @@ export function TransactionForm() {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof transactionFormSchema>) => {
-    console.log(data);
-  };
+  // const onSubmit = (data: z.infer<typeof transactionFormSchema>) => {
+  //   console.log(data);
+  // };
+
+  const transactionType = form.watch('transactionType')
+  const filteredCategories = categories.filter((cat)=> cat.type === transactionType)
 
   return (
     <form
@@ -94,15 +104,16 @@ export function TransactionForm() {
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Category ID</FieldLabel>
 
-              <Select onValueChange={(val)=>{field.value=Number(val)}} value={field.value.toString()}>
+              <Select onValueChange={(val) => field.onChange(Number(val))} value={field.value.toString()}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="transaction type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">1</SelectItem>
-                  <SelectItem value="2">2</SelectItem>
-                  <SelectItem value="3">3</SelectItem>
-                  <SelectItem value="4">4</SelectItem>
+                  {filteredCategories.map((category)=>(
+                    <SelectItem key={category.id} value={category.id.toString()}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

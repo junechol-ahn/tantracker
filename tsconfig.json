@@ -11,5 +11,5 @@
     "skipLibCheck": true,
     "strictNullChecks": true
   },
-  "include": ["src", "components"]
+  "include": ["**/*"]
 }
