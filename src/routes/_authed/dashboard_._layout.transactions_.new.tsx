@@ -10,7 +10,7 @@ function RouteComponent() {
   return (
     <Card className='max-w-3xl mt-4'>
       <CardHeader >
-        <CardTitle>New Transaction</CardTitle>
+        <CardTitle className='font-bold text-2xl'>New Transaction</CardTitle>
       </CardHeader>
       <CardContent>
         <TransactionForm/>

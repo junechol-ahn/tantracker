@@ -17,7 +17,8 @@ function RouteComponent() {
   const isNewPage = location.pathname.endsWith('/new');
 
   return (
-    <div className="max-w-7xl mx-auto py-10">
+    <div className='flex justify-center '>
+    <div className="max-w-7xl mx-auto py-10 w-full px-10">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -47,6 +48,7 @@ function RouteComponent() {
         </BreadcrumbList>
       </Breadcrumb>
       <Outlet />
+    </div>
     </div>
   );
 }

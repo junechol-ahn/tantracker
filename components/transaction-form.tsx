@@ -1,6 +1,31 @@
 import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod'
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
+import { CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldLabel,
+  FieldSet,
+} from './ui/field';
+import { Textarea } from './ui/textarea';
 
 const transactionFormSchema = z.object({
   transactionType: z.enum(['income', 'expense']),
@@ -8,16 +33,23 @@ const transactionFormSchema = z.object({
   transactionDate: z
     .date()
     .max(new Date(), 'Transaction date cannot be in the future'),
-  amount: z.number().positive('Amount must b e greater than 0'),
+  amount: z.number().positive('Amount must be greater than 0'),
   description: z
     .string()
-    .min(3, 'Description must contain at lease 3 characters')
-    .max(300, 'Description must contain a maximun of 300 characters'),
+    .min(3, 'Description must contain at least 3 characters')
+    .max(300, 'Description must contain a maximum of 300 characters'),
 });
 
 export function TransactionForm() {
   const form = useForm<z.infer<typeof transactionFormSchema>>({
-    resolver: zodResolver(transactionFormSchema)
+    resolver: zodResolver(transactionFormSchema),
+    defaultValues: {
+      transactionType: 'expense',
+      categoryId: 1,
+      amount: 0,
+      description: '',
+      transactionDate: new Date()
+    },
   });
 
   const onSubmit = (data: z.infer<typeof transactionFormSchema>) => {
@@ -25,51 +57,133 @@ export function TransactionForm() {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      {/* 컴포넌트를 제어(Controlled)해야 하는 경우 (예: Custom Select, DatePicker 등) */}
-      {/* Controller 또는 useController를 사용합니다. */}
-      
-      {/* 일반적인 Input의 경우 register를 바로 연결합니다. */}
-      <div className="flex flex-col gap-2">
-        <label htmlFor="amount" className="text-sm font-medium">
-          Amount
-        </label>
-        <input 
-          id="amount"
-          type="number"
-          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
-          {...form.register('amount', { valueAsNumber: true })}
-        />
-        {form.formState.errors.amount && (
-          <p className="text-sm text-red-500">
-            {form.formState.errors.amount.message}
-          </p>
-        )}
-      </div>
-      
-      <div className="flex flex-col gap-2">
-        <label htmlFor="description" className="text-sm font-medium">
-          Description
-        </label>
-        <input 
-          id="description"
-          type="text"
-          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
-          {...form.register('description')}
-        />
-        {form.formState.errors.description && (
-          <p className="text-sm text-red-500">
-            {form.formState.errors.description.message}
-          </p>
-        )}
-      </div>
+    <form
+      onSubmit={form.handleSubmit(onSubmit, (errors) =>
+        console.log('Validation errors:', errors),
+      )}
+      className="space-y-6 mb-4"
+    >
+      <FieldSet className="grid grid-cols-2 gap-y-5 gap-x-2">
+        {/* Transaction Type (enum Select) */}
+        <Controller
+          control={form.control}
+          name="transactionType"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Transaction Type</FieldLabel>
 
-      <button 
-        type="submit"
-        className="inline-flex items-center justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white shadow"
-      >
-        Save Transaction
-      </button>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="transaction type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="income">Income</SelectItem>
+                  <SelectItem value="expense">Expense</SelectItem>
+                </SelectContent>
+              </Select>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        {/* Category Id (enum Select) */}
+        <Controller
+          control={form.control}
+          name="categoryId"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Category ID</FieldLabel>
+
+              <Select onValueChange={(val)=>{field.value=Number(val)}} value={field.value.toString()}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="transaction type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1</SelectItem>
+                  <SelectItem value="2">2</SelectItem>
+                  <SelectItem value="3">3</SelectItem>
+                  <SelectItem value="4">4</SelectItem>
+                </SelectContent>
+              </Select>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        {/* Transaction Date (DatePicker) */}
+        <Controller
+          control={form.control}
+          name="transactionDate"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Transaction Date</FieldLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      'w-full justify-start text-left font-normal',
+                      !field.value && 'text-muted-foreground',
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 size-4" />
+                    {field.value ? format(field.value, 'PPP') : 'Pick a date'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) => date > new Date()}
+                  />
+                </PopoverContent>
+              </Popover>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        {/* Amount */}
+        <Controller
+          name="amount"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Amount</FieldLabel>
+
+              <input
+                id="amount"
+                type="number"
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
+                {...form.register('amount', { valueAsNumber: true })}
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        {/* Description */}
+        <Controller
+          name="description"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className="col-span-2">
+              <FieldLabel>Description</FieldLabel>
+
+              <Textarea
+                id="description"
+                className="flex h-18 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors"
+                {...form.register('description')}
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      <Button type="submit" className="col-span-2">Save Transaction</Button>
+      </FieldSet>
     </form>
   );
 }
