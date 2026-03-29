@@ -2,9 +2,11 @@ import { TransactionForm, transactionFormSchema } from '@/components/transaction
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createTransaction } from '@/data/createTransaction'
 import { getCategories } from '@/data/getCategories'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import z, { date } from 'zod'
+import { toast } from 'sonner'
+
 
 export const Route = createFileRoute('/_authed/dashboard_/_layout/transactions_/new')({
   component: RouteComponent,
@@ -16,6 +18,7 @@ export const Route = createFileRoute('/_authed/dashboard_/_layout/transactions_/
 
 function RouteComponent() {
   const {categories} = Route.useLoaderData()
+  const navigate = useNavigate()
   
   async function handleSubmit(data: z.infer<typeof transactionFormSchema>):Promise<void> {
     console.log("HANDLE SUBMIT:", data)
@@ -28,6 +31,8 @@ function RouteComponent() {
       }
     })
     console.log(transaction)
+    toast("Success", {description: 'Transaction created.', position: 'bottom-right'})
+    navigate({to: '/dashboard/transactions', search: { month: data.transactionDate.getMonth() + 1, year: data.transactionDate.getFullYear()}})
   }
 
   return (
