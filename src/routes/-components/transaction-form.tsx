@@ -24,8 +24,8 @@ import {
   FieldError,
   FieldLabel,
   FieldSet,
-} from './ui/field';
-import { Textarea } from './ui/textarea';
+} from '../../components/ui/field';
+import { Textarea } from '../../components/ui/textarea';
 import { categoriesTable } from '@/db/schema';
 
 export const transactionFormSchema = z.object({
@@ -43,10 +43,10 @@ export const transactionFormSchema = z.object({
 
 export function TransactionForm({
   categories,
-  onSubmit
+  onSubmit,
 }: {
-  categories: (typeof categoriesTable.$inferSelect)[],
-  onSubmit: (data: z.infer<typeof transactionFormSchema>) => Promise<void>
+  categories: (typeof categoriesTable.$inferSelect)[];
+  onSubmit: (data: z.infer<typeof transactionFormSchema>) => Promise<void>;
 }) {
   const form = useForm<z.infer<typeof transactionFormSchema>>({
     resolver: zodResolver(transactionFormSchema),
@@ -55,7 +55,7 @@ export function TransactionForm({
       categoryId: 1,
       amount: 0,
       description: '',
-      transactionDate: new Date()
+      transactionDate: new Date(),
     },
   });
 
@@ -63,8 +63,10 @@ export function TransactionForm({
   //   console.log(data);
   // };
 
-  const transactionType = form.watch('transactionType')
-  const filteredCategories = categories.filter((cat)=> cat.type === transactionType)
+  const transactionType = form.watch('transactionType');
+  const filteredCategories = categories.filter(
+    (cat) => cat.type === transactionType,
+  );
 
   return (
     <form
@@ -104,13 +106,19 @@ export function TransactionForm({
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Category ID</FieldLabel>
 
-              <Select onValueChange={(val) => field.onChange(Number(val))} value={field.value.toString()}>
+              <Select
+                onValueChange={(val) => field.onChange(Number(val))}
+                value={field.value.toString()}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="transaction type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {filteredCategories.map((category)=>(
-                    <SelectItem key={category.id} value={category.id.toString()}>
+                  {filteredCategories.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id.toString()}
+                    >
                       {category.name}
                     </SelectItem>
                   ))}
@@ -193,9 +201,13 @@ export function TransactionForm({
             </Field>
           )}
         />
-      <Button type="submit" className="col-span-2" disabled={form.formState.isSubmitting}>
-        {form.formState.isSubmitting ? 'Saving...' : 'Save Transaction'}
-      </Button>
+        <Button
+          type="submit"
+          className="col-span-2"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? 'Saving...' : 'Save Transaction'}
+        </Button>
       </FieldSet>
     </form>
   );

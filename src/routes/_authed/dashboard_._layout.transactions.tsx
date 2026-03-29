@@ -2,6 +2,7 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 import z from 'zod';
 import { AllTransactions } from '../-components/all-transactions';
 import { year } from 'drizzle-orm/mysql-core';
+import { getTransactionYearsRange } from '@/db/queries/getTransactionYearsRange';
 
 const today = new Date();
 
@@ -32,7 +33,9 @@ export const Route = createFileRoute(
     }
   },
   loader: async ({deps})=> {
+    const yearsRange = await getTransactionYearsRange()
     return {
+      yearsRange,
       month: deps.month,
       year: deps.year,
     }
@@ -40,6 +43,6 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const {month, year} = Route.useLoaderData()
-  return <AllTransactions month={month} year={year}/>
+  const {month, year, yearsRange} = Route.useLoaderData()
+  return <AllTransactions month={month} year={year} yearsRange={yearsRange}/>
 }

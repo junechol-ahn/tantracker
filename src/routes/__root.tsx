@@ -27,7 +27,7 @@ import poppins800 from '@fontsource/poppins/800.css?url';
 import poppins900 from '@fontsource/poppins/900.css?url';
 import { ChartColumnBigIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getSignedInUserId } from '@/data/getSignedInUserId';
+import { getSignedInUserId } from '@/db/queries/getSignedInUserId';
 import { Toaster } from '@/components/ui/sonner';
 
 export const Route = createRootRoute({

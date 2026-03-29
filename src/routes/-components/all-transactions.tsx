@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { useState } from "react";
 
 
-export function AllTransactions({month, year}: {month:number, year:number}) {
+export function AllTransactions({month, year, yearsRange}: {month:number, year:number, yearsRange: number[]}) {
   const [selectedMonth, setSelectedMonth] = useState(month)
   const [selectedYear, setSelectedYear] = useState(year)
 
@@ -14,7 +14,7 @@ export function AllTransactions({month, year}: {month:number, year:number}) {
   const selectedDate = new Date(selectedYear, selectedMonth-1, 1)
   const today = new Date()
   const thisYear = today.getFullYear()
-  const yearsToShow = 10
+  // const yearsToShow = 10
 
   return <Card className="mt-4">
     <CardHeader>
@@ -40,9 +40,9 @@ export function AllTransactions({month, year}: {month:number, year:number}) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Array.from({length:yearsToShow}).map((_,i)=>(
-                <SelectItem key={i} value={`${thisYear-yearsToShow+i+1}`}>
-                  {format(new Date(thisYear-yearsToShow+i+1, 1, 1), "yyyy")}
+              {yearsRange.map((year)=>(
+                <SelectItem key={year} value={`${year}`}>
+                  {format(new Date(year, 1, 1), "yyyy")}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -56,5 +56,10 @@ export function AllTransactions({month, year}: {month:number, year:number}) {
         </div>
       </CardTitle>
     </CardHeader>
+      <CardContent>
+        <Button asChild>
+          <Link to="/dashboard/transactions/new">New Transaction</Link>
+        </Button>
+      </CardContent>
   </Card>
 }

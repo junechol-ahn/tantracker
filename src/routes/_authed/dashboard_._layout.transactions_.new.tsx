@@ -1,10 +1,10 @@
 import {
   TransactionForm,
   transactionFormSchema,
-} from '@/components/transaction-form';
+} from '@/routes/-components/transaction-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createTransaction } from '@/data/createTransaction';
-import { getCategories } from '@/data/getCategories';
+import { createTransaction } from '@/db/queries/createTransaction';
+import { getCategories } from '@/db/queries/getCategories';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import z, { date } from 'zod';
