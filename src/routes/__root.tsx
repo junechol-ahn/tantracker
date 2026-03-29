@@ -28,7 +28,7 @@ import poppins900 from '@fontsource/poppins/900.css?url';
 import { ChartColumnBigIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getSignedInUserId } from '@/data/getSignedInUserId';
-import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
 
 export const Route = createRootRoute({
   notFoundComponent(){
