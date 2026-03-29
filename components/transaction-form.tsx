@@ -193,7 +193,9 @@ export function TransactionForm({
             </Field>
           )}
         />
-      <Button type="submit" className="col-span-2">Save Transaction</Button>
+      <Button type="submit" className="col-span-2" disabled={form.formState.isSubmitting}>
+        {form.formState.isSubmitting ? 'Saving...' : 'Save Transaction'}
+      </Button>
       </FieldSet>
     </form>
   );
