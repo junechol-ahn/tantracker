@@ -14,7 +14,11 @@ export const Route = createFileRoute('/_authed/dashboard_/_layout')({
 
 function RouteComponent() {
   const location = useLocation();
+  const isTransactionsPage = location.pathname === '/dashboard/transactions';
   const isNewPage = location.pathname.endsWith('/new');
+  const isTransactionDetailPage = /^\/dashboard\/transactions\/[^/]+$/.test(
+    location.pathname,
+  );
 
   return (
     <div className='flex justify-center '>
@@ -28,20 +32,22 @@ function RouteComponent() {
           </BreadcrumbItem>
           <BreadcrumbSeparator></BreadcrumbSeparator>
           <BreadcrumbItem>
-            {isNewPage ? (
+            {isTransactionsPage ? (
+              <BreadcrumbPage>Transactions</BreadcrumbPage>
+            ) : (
               <BreadcrumbLink asChild>
                 <Link to="/dashboard/transactions">Transactions</Link>
               </BreadcrumbLink>
-            ) : (
-              <BreadcrumbPage>Transactions</BreadcrumbPage>
             )}
           </BreadcrumbItem>
           
-          {isNewPage && (
+          {(isNewPage || isTransactionDetailPage) && (
             <>
               <BreadcrumbSeparator></BreadcrumbSeparator>
               <BreadcrumbItem>
-                <BreadcrumbPage>New Transaction</BreadcrumbPage>
+                <BreadcrumbPage>
+                  {isNewPage ? 'New Transaction' : 'Edit Transaction'}
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </>
           )}

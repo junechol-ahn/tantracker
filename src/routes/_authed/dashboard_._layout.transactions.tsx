@@ -3,6 +3,7 @@ import z from 'zod';
 import { AllTransactions } from '../-components/all-transactions';
 import { year } from 'drizzle-orm/mysql-core';
 import { getTransactionYearsRange } from '@/db/queries/getTransactionYearsRange';
+import { getTransactionsByMonth } from '@/db/queries/getTransactionsByMonth';
 
 const today = new Date();
 
@@ -26,23 +27,38 @@ export const Route = createFileRoute(
 )({
   component: RouteComponent,
   validateSearch: searchSchema,
-  loaderDeps: ({search}) =>{
-    return{
+  loaderDeps: ({ search }) => {
+    return {
       month: search.month,
       year: search.year,
-    }
+    };
   },
-  loader: async ({deps})=> {
-    const yearsRange = await getTransactionYearsRange()
+  loader: async ({ deps }) => {
+    const yearsRange = await getTransactionYearsRange();
+    const transactions = await getTransactionsByMonth({
+      data: {
+        month: deps.month,
+        year: deps.year,
+      },
+    });
     return {
       yearsRange,
+      transactions,
       month: deps.month,
       year: deps.year,
-    }
+    };
   },
 });
 
 function RouteComponent() {
-  const {month, year, yearsRange} = Route.useLoaderData()
-  return <AllTransactions month={month} year={year} yearsRange={yearsRange}/>
+  const { month, year, yearsRange, transactions } = Route.useLoaderData();
+  console.log(transactions);
+  return (
+    <AllTransactions
+      month={month}
+      year={year}
+      yearsRange={yearsRange}
+      transactions={transactions}
+    />
+  );
 }
