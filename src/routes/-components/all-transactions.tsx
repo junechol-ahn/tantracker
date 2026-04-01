@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Link } from '@tanstack/react-router';
+import { Link, useRouter } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import numeral from 'numeral';
@@ -40,6 +40,7 @@ export function AllTransactions({
     transactionType: 'income' | 'expense' | null;
   }[];
 }) {
+  const router = useRouter()
   const [selectedMonth, setSelectedMonth] = useState(month);
   const [selectedYear, setSelectedYear] = useState(year);
 
@@ -148,6 +149,12 @@ export function AllTransactions({
                       aria-label="Edit Transaction"
                     >
                       <Link
+                        onClick={()=>{
+                          router.clearCache({
+                            filter: (route)=>
+                              route.pathname !== `/dashboard/transactions/${t.id}`
+                          })
+                        }}
                         to="/dashboard/transactions/$transactionId"
                         params={{ transactionId: t.id.toString() }}
                       >
